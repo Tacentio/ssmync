@@ -1,0 +1,14 @@
+[package]
+name = "ssmync"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+aws-config = "0.8.0"
+aws-sdk-ssm = "0.8.0"
+aws-sdk-ec2 = "0.8.0"
+tokio = { version = "1", features = ["full"] }
+clap = { version = "3.1.2", features = ["derive", "env"] }
+colored = "2.0.0"
