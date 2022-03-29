@@ -8,6 +8,13 @@ Your machine must be authenticated to AWS in some way. Uses the provider chain t
 
 ## Installation
 
+### MacOS
+
+```
+brew tap tacentio/ssmync
+brew install ssmync
+```
+
 ## Usage
 
 ```
