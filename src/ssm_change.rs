@@ -71,41 +71,44 @@ impl SSMChange {
     ) -> Result<SSMChange, SSMChangeError> {
         match result {
             Ok(param) => {
-                if let Some(parameter) = param.parameter {
-                    if let Some(value) = parameter.value {
-                        if let Some(type_param) = parameter.r#type {
-                            if !value.eq(new_value) {
-                                return Ok(SSMChange::new(
-                                    Action::Update,
-                                    &region,
-                                    &ssm_parameter,
-                                    &new_value,
-                                    type_param,
-                                ));
-                            } else {
-                                return Ok(SSMChange::new(
-                                    Action::NoAction,
-                                    &region,
-                                    &ssm_parameter,
-                                    &new_value,
-                                    type_param,
-                                ));
-                            }
-                        } else {
-                            return Err(SSMChangeError::new(
-                                CalculateSSMChangeErrorKind::NoValueInParameter,
-                            ));
-                        }
-                    } else {
-                        return Err(SSMChangeError::new(
-                            CalculateSSMChangeErrorKind::NoValueInParameter,
-                        ));
-                    }
-                } else {
+                if param.parameter().is_none() {
                     return Err(SSMChangeError::new(
                         CalculateSSMChangeErrorKind::NoParameterInResponse,
                     ));
                 }
+
+                if param.parameter().unwrap().value().is_none() {
+                    return Err(SSMChangeError::new(
+                        CalculateSSMChangeErrorKind::NoValueInParameter,
+                    ));
+                }
+
+                if param.parameter().unwrap().r#type().is_none() {
+                    return Err(SSMChangeError::new(
+                        CalculateSSMChangeErrorKind::NoValueInParameter,
+                    ));
+                }
+
+                let value = param.parameter().unwrap().value().unwrap();
+                let type_param = param.parameter().unwrap().r#type().unwrap();
+
+                if !value.eq(new_value) {
+                    return Ok(SSMChange::new(
+                        Action::Update,
+                        &region,
+                        &ssm_parameter,
+                        &new_value,
+                        parameter_type_from_ref(type_param),
+                    ));
+                }
+
+                return Ok(SSMChange::new(
+                    Action::NoAction,
+                    &region,
+                    &ssm_parameter,
+                    &new_value,
+                    parameter_type_from_ref(type_param),
+                ));
             }
             Err(e) => match e {
                 aws_sdk_ssm::Error::ParameterNotFound(_) => {

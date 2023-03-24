@@ -45,12 +45,10 @@ pub async fn run(cli_args: CommandLineArgs) -> Result<(), Box<dyn Error>> {
     };
     let value = match cli_args.value {
         Some(val) => {
-            print_warning("Value provided via CLI. If this is a secret, please ensure you remove this command from your shells history, or ensure a ' ' space was prepended to the command");            
+            print_warning("Value provided via CLI. If this is a secret, please ensure you remove this command from your shells history, or ensure a ' ' space was prepended to the command");
             val
         }
-        None => {
-           get_value_from_stdin()?
-        }
+        None => get_value_from_stdin()?,
     };
     // Stores the changes that will be made to the SSM Parameter in each region.
     let mut changes: Vec<SSMChange> = Vec::with_capacity(regions.len());
